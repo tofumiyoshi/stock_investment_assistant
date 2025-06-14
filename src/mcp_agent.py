@@ -1,6 +1,7 @@
 from typing import Dict, Any
-from mcp_sdk import DeepSeekReasoner, DeepSeekChat
-from mcp_agent import Evaluator, Optimizer
+import httpx
+from evaluator import Evaluator
+from optimizer import Optimizer
 import yaml
 import os
 from dotenv import load_dotenv
@@ -11,11 +12,18 @@ load_dotenv()
 class MCPAgent:
     def __init__(self, config_path: str = "config.yaml"):
         """MCP Agentの初期化"""
-        with open(config_path) as f:
-            config_content = f.read()
-            # 環境変数を展開
-            config_content = os.path.expandvars(config_content)
-            self.config = yaml.safe_load(config_content)
+        try:
+            with open(config_path, encoding='utf-8') as f:
+                config_content = f.read()
+                # 環境変数を展開
+                config_content = os.path.expandvars(config_content)
+                self.config = yaml.safe_load(config_content)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"設定ファイル {config_path} が見つかりません")
+        except UnicodeDecodeError:
+            raise UnicodeDecodeError("設定ファイルの文字コードが不正です。UTF-8で保存してください")
+        except yaml.YAMLError as e:
+            raise ValueError(f"設定ファイルのYAML形式が不正です: {str(e)}")
         
         # コンポーネント初期化
         self.evaluator = Evaluator(config_path)
@@ -73,17 +81,63 @@ class MCPAgent:
         return {}
     
     def _analyze_with_reasoner(self, query: str, data: Dict) -> Dict:
-        """deeseek reasonerを使用して分析実行"""
-        reasoner = DeepSeekReasoner(
-            api_key=self.config['llm']['reasoner']['api_key'],
-            params=self.reasoner_params
-        )
-        return reasoner.analyze(query, data)
+        """httpxを使用して分析実行"""
+        headers = {
+            "Authorization": f"Bearer {self.config['llm']['reasoner']['api_key']}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "query": query,
+            "data": data,
+            "params": self.reasoner_params
+        }
+        # テスト用のモックレスポンス
+        if os.getenv("TEST_MODE") == "true":
+            return {
+                "input_features": {"query": query, "data": data},
+                "target": "test_response",
+                "score": 0.85
+            }
+        
+        endpoint = os.getenv("DEEPSEEK_REASONER_ENDPOINT", "https://api.example.com/reason")
+        with httpx.Client() as client:
+            response = client.post(
+                endpoint,
+                headers=headers,
+                json=payload
+            )
+            response.raise_for_status()
+            return response.json()
     
     def _generate_report_with_chat(self, result: Dict) -> str:
-        """deepseek chatを使用してレポート生成"""
-        chat = DeepSeekChat(
-            api_key=self.config['llm']['chat']['api_key'],
-            params=self.chat_params
-        )
-        return chat.generate_report(result)
+        """httpxを使用してレポート生成"""
+        # テスト用のモックレスポンス
+        if os.getenv("TEST_MODE") == "true":
+            return f"テストレポート: {result}"
+            
+        headers = {
+            "Authorization": f"Bearer {self.config['llm']['chat']['api_key']}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "analysis_result": result,
+            "params": self.chat_params
+        }
+        endpoint = os.getenv("DEEPSEEK_CHAT_ENDPOINT", "https://api.example.com/chat")
+        with httpx.Client() as client:
+            response = client.post(
+                endpoint,
+                headers=headers,
+                json=payload
+            )
+            response.raise_for_status()
+            return response.text
+
+if __name__ == "__main__":
+    # テスト用のエントリポイント
+    agent = MCPAgent()
+    test_query = "テストクエリ"
+    print(f"処理開始: {test_query}")
+    result = agent.process_query(test_query)
+    print("処理結果:")
+    print(result)

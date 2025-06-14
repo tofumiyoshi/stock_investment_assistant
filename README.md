@@ -15,7 +15,6 @@
 - **データベース**: ローカルSQLite
 - **主要ライブラリ**:
   - yfinance (Yahoo Finance APIクライアント)
-  - LangChain (LLM統合)
   - pandas (データ分析)
   - MCP Agent (推論エンジン)
 
