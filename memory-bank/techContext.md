@@ -15,7 +15,6 @@
 
 ## 依存関係
 - yfinance (Yahoo Finance APIクライアント)
-- LangChain (LLM統合)
 - pandas (データ分析)
 - MCP Agent (推論エンジン)
 
