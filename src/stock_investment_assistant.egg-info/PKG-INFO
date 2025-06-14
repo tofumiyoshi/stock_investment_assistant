@@ -13,6 +13,7 @@ Requires-Dist: python-dotenv==1.1.0
 Requires-Dist: PyYAML==6.0.2
 Requires-Dist: mcp[cli]>=1.9.4
 Requires-Dist: mcp-agent>=0.0.1
+Requires-Dist: yfinance>=0.2.62
 
 # 株投資アシスタント
 

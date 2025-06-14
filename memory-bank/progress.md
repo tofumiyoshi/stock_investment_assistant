@@ -5,9 +5,10 @@ gantt
     title プロジェクトガントチャート
     dateFormat  YYYY-MM-DD
     section メインタスク
+    MCPAgentコア実装完了                   :done, 2025-06-10, 2025-06-14
     Yahoo Finance API連携モジュール開発     :a1, 2025-06-15, 10d
     チャットボットUIプロトタイプ作成        :a2, 2025-06-20, 7d
-    LLM統合基本実装                         :a3, after a1, 12d
+    EvaluatorOptimizerLLMテスト実装        :a3, after a1, 8d
     テストフェーズ                          :a4, after a3, 5d
 ```
 
@@ -15,7 +16,13 @@ gantt
 [プロジェクトの全体的な進捗状況]
 
 ## 完了済み項目
-[これまでに完了した主要な機能やタスク]
+- MCPAgentコア実装:
+  - optimizer/evaluatorエージェント初期化
+  - evaluator_optimizer_callメソッド実装
+  - テスト用エントリーポイント追加
+- 環境変数管理システム (.env + config.yaml)
+- richライブラリによるロギング統合
+- テストモード基本実装
 
 ## 未完了項目
 [まだ完了していない重要な項目]

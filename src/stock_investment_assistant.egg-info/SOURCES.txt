@@ -1,8 +1,6 @@
 README.md
 pyproject.toml
-src/evaluator.py
 src/mcp_agent.py
-src/optimizer.py
 src/stock_investment_assistant.egg-info/PKG-INFO
 src/stock_investment_assistant.egg-info/SOURCES.txt
 src/stock_investment_assistant.egg-info/dependency_links.txt

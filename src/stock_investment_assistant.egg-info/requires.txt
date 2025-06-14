@@ -5,3 +5,4 @@ python-dotenv==1.1.0
 PyYAML==6.0.2
 mcp[cli]>=1.9.4
 mcp-agent>=0.0.1
+yfinance>=0.2.62
